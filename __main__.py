@@ -1,10 +1,17 @@
 import pygame
 from spot import Spot
 from algorithms import astar_algorithm
-from algorithms import dijkstra_algorithm
+from algorithms import bfs
+from algorithms import make_borders
+from algorithms import best_first_search
 from constants import *
 
-def make_grid(rows, width):
+def make_grid(rows, width, maze=False):
+	#If maze wanted return a grid that has a random maze produced by prims algorithm
+	if maze:
+		return prims_algorithm(rows, width)
+
+	#Else return an grid of white spots
 	grid = []
 	gap = width // rows
 	for i in range(rows):
@@ -85,18 +92,21 @@ def main(win, width):
 					end = None
 
 			if event.type == pygame.KEYDOWN:
-				if event.key == pygame.K_SPACE and start and end:
+				if event.key == pygame.K_a and start and end:
 					for row in grid:
 						for spot in row:
 							spot.update_neighbors(grid)
-					run_algo = input("Enter algorithm to visualize: ")
-					if run_algo == 'a':
-						astar_algorithm(lambda: draw(win, grid, ROWS, width), grid, start, end)
-					elif run_algo == 'd':
-						dijkstra_algorithm(lambda: draw(win, grid, ROWS, width), grid, start, end)
-					else:
-						print('Invalid input')
-
+					astar_algorithm(lambda: draw(win, grid, ROWS, width), grid, start, end)
+				if event.key == pygame.K_b and start and end:
+					for row in grid:
+						for spot in row:
+							spot.update_neighbors(grid)
+					bfs(lambda: draw(win, grid, ROWS, width), grid, start, end)
+				if event.key == pygame.K_f and start and end:
+					for row in grid:
+						for spot in row:
+							spot.update_neighbors(grid)
+					best_first_search(lambda: draw(win, grid, ROWS, width), grid, start, end)
 				if event.key == pygame.K_c:
 					start = None
 					end = None
@@ -104,8 +114,8 @@ def main(win, width):
 
 	pygame.quit()
 
-if __name__ == "__main__":
-	WIDTH = 700
-	WIN = pygame.display.set_mode((WIDTH, WIDTH))
-	pygame.display.set_caption("Path Finding Algorithm Visualization")
-	main(WIN, WIDTH)
+
+WIDTH = 700
+WIN = pygame.display.set_mode((WIDTH, WIDTH))
+pygame.display.set_caption("Path Finding Algorithm Visualization")
+main(WIN, WIDTH)
